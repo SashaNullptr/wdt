@@ -17,7 +17,7 @@
 #  of patent rights can be found in the PATENTS file in the same directory.
 #
 
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.7)
 
 # There is no C per se in WDT but if you use CXX only here many checks fail
 # Version is Major.Minor.YYMMDDX for up to 10 releases per day (X from 0 to 9)
@@ -51,74 +51,6 @@ set(CMAKE_CXX_FLAGS "-msse4.2 -mpclmul")
 #set(CMAKE_CXX_FLAGS "-msse4.2 -mpclmul -Wextra -Wsign-compare -Wunused-variable -Wconversion -Wsign-conversion")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "_bin/wdt")
 
-# Check that we have the Folly source tree
-set(FOLLY_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../folly" CACHE path
-    "Folly source tree (folly/Conv.h should be reachable from there")
-# Check for folly - TODO: this doesn't work well for relative paths
-# (because of relative to build dir vs relative to source tree for -I)
-if(NOT EXISTS "${FOLLY_SOURCE_DIR}/folly/Conv.h")
-  MESSAGE(FATAL_ERROR "${FOLLY_SOURCE_DIR}/folly/Conv.h not found
-Fix using:
-(in a sister directory of the wdt source tree - same level:)
-git clone https://github.com/facebook/folly.git
-or change FOLLY_SOURCE_DIR (use ccmake or -DFOLLY_SOURCE_DIR=...)
-")
-endif()
-
-
-# The part of folly that isn't pure .h and we use:
-set (FOLLY_CPP_SRC
-"${FOLLY_SOURCE_DIR}/folly/Conv.cpp"
-"${FOLLY_SOURCE_DIR}/folly/Demangle.cpp"
-"${FOLLY_SOURCE_DIR}/folly/hash/Checksum.cpp"
-"${FOLLY_SOURCE_DIR}/folly/hash/detail/ChecksumDetail.cpp"
-"${FOLLY_SOURCE_DIR}/folly/hash/detail/Crc32cDetail.cpp"
-"${FOLLY_SOURCE_DIR}/folly/hash/detail/Crc32CombineDetail.cpp"
-"${FOLLY_SOURCE_DIR}/folly/lang/ColdClass.cpp"
-"${FOLLY_SOURCE_DIR}/folly/ScopeGuard.cpp"
-)
-
-# WDT's library proper - comes from: ls -1 *.cpp | grep -iv test
-add_library(wdt_min
-util/WdtSocket.cpp
-util/ClientSocket.cpp
-util/EncryptionUtils.cpp
-util/DirectorySourceQueue.cpp
-ErrorCodes.cpp
-util/FileByteSource.cpp
-util/FileCreator.cpp
-Protocol.cpp
-WdtThread.cpp
-util/ThreadsController.cpp
-ReceiverThread.cpp
-Receiver.cpp
-WdtTransferRequest.cpp
-Reporting.cpp
-util/ThreadTransferHistory.cpp
-SenderThread.cpp
-Sender.cpp
-util/ServerSocket.cpp
-Throttler.cpp
-WdtOptions.cpp
-util/FileWriter.cpp
-util/TransferLogManager.cpp
-util/SerializationUtil.cpp
-util/Stats.cpp
-WdtBase.cpp
-WdtResourceController.cpp
-util/CommonImpl.cpp
-)
-# Source files that depend on gflags and provide flags -> options init
-set (WDT_FLAGS_RELATED_SRC
-util/WdtFlags.cpp
-Wdt.cpp
-)
-add_library(wdt ${WDT_FLAGS_RELATED_SRC})
-
-target_link_libraries(wdt wdt_min)
-
-
-
 # Folly uses boost system and filesystem
 #set(Boost_USE_STATIC_LIBS on)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
@@ -141,15 +73,69 @@ find_library(GFLAGS_LIBRARY gflags)
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+find_package(Folly REQUIRED)
+include_directories(${FOLLY_INCLUDE_DIRS})
+
+#set(FOLLY_LIBRARIES Folly::folly)
+
+if (NOT folly_FIND_QUIETLY)
+  message(STATUS "Using folly library dir of: ${FOLLY_LIBRARY_DIRS}")
+  message(STATUS "With the following libraries: ${FOLLY_LIBRARIES}")
+  message(STATUS "Using folly include dir of: ${FOLLY_INCLUDE_DIRS}")
+endif()
+
+# WDT's library proper - comes from: ls -1 *.cpp | grep -iv test
+add_library(wdt_min
+        util/WdtSocket.cpp
+        util/ClientSocket.cpp
+        util/EncryptionUtils.cpp
+        util/DirectorySourceQueue.cpp
+        ErrorCodes.cpp
+        util/FileByteSource.cpp
+        util/FileCreator.cpp
+        Protocol.cpp
+        WdtThread.cpp
+        util/ThreadsController.cpp
+        ReceiverThread.cpp
+        Receiver.cpp
+        WdtTransferRequest.cpp
+        Reporting.cpp
+        util/ThreadTransferHistory.cpp
+        SenderThread.cpp
+        Sender.cpp
+        util/ServerSocket.cpp
+        Throttler.cpp
+        WdtOptions.cpp
+        util/FileWriter.cpp
+        util/TransferLogManager.cpp
+        util/SerializationUtil.cpp
+        util/Stats.cpp
+        WdtBase.cpp
+        WdtResourceController.cpp
+        util/CommonImpl.cpp
+        )
+# Source files that depend on gflags and provide flags -> options init
+set (WDT_FLAGS_RELATED_SRC
+        util/WdtFlags.cpp
+        Wdt.cpp
+        )
+
+add_library(wdt ${WDT_FLAGS_RELATED_SRC})
+
+target_link_libraries(wdt wdt_min)
+
+
 # You can also add jemalloc to the list if you have it/want it
 target_link_libraries(wdt_min
-  folly4wdt
-  ${GLOG_LIBRARY}
-  ${GFLAGS_LIBRARY}
-  ${Boost_LIBRARIES}
-  ${DOUBLECONV_LIBRARY}
-  ${OPENSSL_CRYPTO_LIBRARY}
-  ${CMAKE_THREAD_LIBS_INIT} # Must be last to avoid link errors
+${FOLLY_LIBRARIES}
+${GLOG_LIBRARY}
+${GFLAGS_LIBRARY}
+${Boost_LIBRARIES}
+${DOUBLECONV_LIBRARY}
+${OPENSSL_CRYPTO_LIBRARY}
+${CMAKE_THREAD_LIBS_INIT} # Must be last to avoid link errors
 )
 
 # What we need to build the part of folly we use:
@@ -200,13 +186,9 @@ if (NOT FOLLY_HAVE_WEAK_SYMBOLS)
   message(STATUS "no weak symbols, adding MallocImpl to folly src")
 endif()
 
-add_library(folly4wdt ${FOLLY_CPP_SRC})
-target_link_libraries(folly4wdt ${GLOG_LIBRARY} ${DOUBLECONV_LIBRARY})
-
 # Order is important - inside fb we want the above
 # folly-config.h to be picked up instead of the fbcode one
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${FOLLY_SOURCE_DIR})
 include_directories(${DOUBLECONV_INCLUDE_DIR})
 include_directories(${GLOG_INCLUDE_DIR})
 include_directories(${GFLAGS_INCLUDE_DIR})
@@ -217,9 +199,11 @@ set_target_properties(wdtbin PROPERTIES COMPILE_DEFINITIONS "STANDALONE_APP")
 
 target_link_libraries(wdtbin wdt_min)
 
-### Install rules
+
+## Install rules
 set_target_properties(wdtbin PROPERTIES RUNTIME_OUTPUT_NAME "wdt")
-install(TARGETS wdtbin wdt wdt_min folly4wdt
+
+install(TARGETS wdtbin wdt wdt_min
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
