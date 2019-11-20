@@ -47,7 +47,7 @@ mkdir _build && cd _build
 
 # Build Folly  make filesas position independent code
 cmake ..
--DCMAKE_CXX_STANDARD=17 \
+-DCMAKE_CXX_STANDARD=14 \
 -DCMAKE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/ \
 -DBUILD_SHARED_LIBS=ON \
 -DCMAKE_POSITION_INDEPENDENT_CODE=ON
