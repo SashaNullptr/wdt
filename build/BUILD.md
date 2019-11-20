@@ -83,6 +83,26 @@ make -j
 CTEST_OUTPUT_ON_FAILURE=1 make test
 sudo make install
 ```
+
+### Built with Testing Enabled
+
+In order to run tests we'll need
+
+```shell script
+sudo apt-get install libgtest-dev cmake
+
+cd /usr/src/gtest
+sudo cmake . -DCMAKE_POSITION_INDEPENDENT_CODE
+sudo make -j$(nproc)
+sudo make install
+
+sudo cp *.a /usr/lib
+sudo ln -s /usr/lib/libgtest.a /usr/local/lib/gtest/libgtest.a
+sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a
+```
+
+Note, gtest needs to built with `cmake . -DCMAKE_POSITION_INDEPENDENT_CODE` in order to work properly with WDT.
+
 # Install on Mac OS X
 
 Open the terminal application and type "git" or "make" to be prompted to install the developper command line tools.
