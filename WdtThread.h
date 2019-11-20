@@ -7,7 +7,7 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 #pragma once
-#include <folly/lang/Bits.h>
+#include <folly/Bits.h>
 #include <wdt/ErrorCodes.h>
 #include <wdt/Protocol.h>
 #include <wdt/util/CommonImpl.h>

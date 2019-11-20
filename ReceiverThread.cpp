@@ -12,7 +12,7 @@
 #include <folly/ScopeGuard.h>
 #include <folly/String.h>
 #include <folly/hash/Checksum.h>
-#include <folly/lang/Bits.h>
+#include <folly/Bits.h>
 #include <wdt/util/FileWriter.h>
 
 namespace facebook {

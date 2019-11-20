@@ -22,7 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <folly/synchronization/RWSpinLock.h>
+#include <folly/RWSpinLock.h>
 
 namespace facebook {
 namespace wdt {
