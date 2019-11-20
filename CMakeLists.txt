@@ -34,12 +34,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 option(STATIC_BUILD "Build and link against static binaries" OFF)
 
 if(STATIC_BUILD)
+  message(STATUS "Using static linking.")
   SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a") # Look for static libraries
   SET(BUILD_SHARED_LIBS OFF)
   SET(CMAKE_EXE_LINKER_FLAGS "-static")
+  set(CMAKE_POSITION_INDEPENDENT_CODE OFF) # Do not use the -fpic flag when compiling
 else()
+  message(STATUS "Using dynamic linking.")
   SET(BUILD_SHARED_LIBS ON)
-  SET(CMAKE_POSITION_INDEPENDENT_CODE ON) # Use the -fpic flag when compiling
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Use the -fpic flag when compiling
 endif()
 
 # CMake default behavior should be to set rpath when needed (non system install)
