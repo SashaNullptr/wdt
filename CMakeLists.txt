@@ -246,42 +246,15 @@ if (BUILD_TESTING)
     test/TestCommon.cpp
   )
 
-  include(ExternalProject)
-
-  # GTest
-  set(GTEST_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/gtest")
-  externalproject_add(
-    gtest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    INSTALL_COMMAND "" # Disable install step
-    UPDATE_COMMAND "" # Doesn't change often
-    PREFIX "${GTEST_PREFIX}"
-    #CONFIGURE_COMMAND "" # skip
-    #BUILD_COMMAND "" # skip
-    LOG_DOWNLOAD ON
-    LOG_CONFIGURE ON
-    LOG_BUILD ON
-  )
-  # Specify include dir for gtest
-  externalproject_get_property(gtest SOURCE_DIR)
-  include_directories("${SOURCE_DIR}/googletest/include")
-
-  externalproject_get_property(gtest BINARY_DIR)
-
-  #  add_library(gmock_all STATIC EXCLUDE_FROM_ALL
-  #   ${GMOCK_PREFIX}/src/gmock/gtest/src/gtest-all.cc
-  #   ${GMOCK_PREFIX}/src/gmock/gmock-all.cc
-  #   ${GMOCK_PREFIX}/src/gmock/gmock_main.cc)
-
-  add_dependencies(wdt4tests_min gtest)
+  find_package(GTest REQUIRED)
 
   # ${BINARY_DIR}/libgtest.a works everywhere except xcode...
 # so ugly weird hack generating warnings about unknown dir for now:
   target_link_libraries(wdt4tests_min
-    #"-L ${BINARY_DIR}/googlemock/gtest -L ${BINARY_DIR}/Debug -lgtest"
-    "-L ${BINARY_DIR}/googlemock/gtest -lgtest"
-    wdt_min
-  )
+          GTest::GTest
+          GTest::Main
+          wdt_min
+        )
 
   add_library(wdt4tests
     ${WDT_FLAGS_RELATED_SRC}
@@ -304,12 +277,13 @@ if (BUILD_TESTING)
   add_library(wdtbenchtestslib
     bench/WdtGenTestUtils.cpp
   )
-  add_dependencies(wdtbenchtestslib gtest)
+
   target_link_libraries(wdtbenchtestslib
-    "-L ${BINARY_DIR}/googlemock/gtest -lgtest"
-    wdtbenchlib
-    ${CMAKE_THREAD_LIBS_INIT} # Must be last to avoid link errors
-  )
+          GTest::GTest
+          GTest::Main
+          wdtbenchlib
+          ${CMAKE_THREAD_LIBS_INIT} # Must be last to avoid link errors
+        )
 
   add_executable(wdt_gen_files bench/wdtGenFiles.cpp)
   target_link_libraries(wdt_gen_files wdtbenchlib
