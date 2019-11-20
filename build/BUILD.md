@@ -101,9 +101,9 @@ CTEST_OUTPUT_ON_FAILURE=1 make test
 sudo make install
 ```
 
-### Built with Testing Enabled
+__Built wdt with tests enabled (optional)__
 
-In order to run tests we'll need
+First we need to install gtest.
 
 ```shell script
 sudo apt-get install libgtest-dev cmake
