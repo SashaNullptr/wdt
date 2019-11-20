@@ -13,11 +13,6 @@
 #
 # find_package(Folly ...)
 #
-#
-# The following variables control which libraries are found::
-#
-#   FOLLY_USE_STATIC_LIBS  - Set to ON to force use of static libraries.
-#
 # The following are set after the configuration is done:
 #
 # ::
@@ -36,12 +31,6 @@
 #    if(FOLLY_FOUND)
 #      target_link_libraries(<YourTarget> ${FOLLY_LIBRARIES})
 #    endif()
-
-if(FOLLY_USE_STATIC_LIBS)
-    set(_CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
-    set(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
-endif()
-
 
 find_library(FOLLY_LIBRARY
         NAMES folly
