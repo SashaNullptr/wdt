@@ -90,8 +90,7 @@ gtest (google testing) but only for tests
 glog (google logging library) - use W*LOG macros so everything logged by WDT
 is always prefixed by "wdt>" which helps when embedded in another service
 
-Parts of Facebook's Folly open source library (as set in the CMakefile)
-Mostly conv, threadlocal and checksum support.
+Facebook's [Folly](https://github.com/facebook/folly) open source library. Should be installed on the local system.
 
 For encryption, the crypto lib part of openssl-1.x
 

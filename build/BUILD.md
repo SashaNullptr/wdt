@@ -35,9 +35,26 @@ tar xvfz cmake-3.2.3.tar.gz
 cd cmake-3.2.3
 ./bootstrap --prefix=/usr --parallel=16 && make -j && sudo make install
 ```
-__Get folly source tree__
+
+__Build Folly from source__
 ```
+# Clone Folly
 git clone https://github.com/facebook/folly.git
+cd folly
+
+# Make and out-of-source build directory
+mkdir _build && cd _build
+
+# Build Folly  make filesas position independent code
+cmake ..
+-DCMAKE_CXX_STANDARD=17 \
+-DCMAKE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/ \
+-DBUILD_SHARED_LIBS=ON \
+-DCMAKE_POSITION_INDEPENDENT_CODE=ON
+
+# Build and install Folly
+make -j$(nproc)
+sudo make install 
 ```
 __Install glog-dev (includes gflags, libunwind), boost system, double conversion
 if you can find a binary distrubution for your variant of linux:__
@@ -154,10 +171,8 @@ brew install openssl
 
 __Build wdt from source__
 
-Get folly source for use during build
-```
-git clone https://github.com/facebook/folly.git
-```
+Install Folly from source (see previous section).
+
 Fetch wdt source
 ```
 git clone https://github.com/facebook/wdt.git
