@@ -31,8 +31,6 @@ project("WDT" LANGUAGES C CXX VERSION 1.32.1910230)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
-option(STATIC_BUILD "Build and link against static binaries" OFF)
-
 # Build position indepedent shared objects
 SET(BUILD_SHARED_LIBS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Use the -fpic flag when compiling
