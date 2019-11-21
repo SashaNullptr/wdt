@@ -131,14 +131,14 @@ target_link_libraries(wdt wdt_min)
 
 # You can also add jemalloc to the list if you have it/want it
 target_link_libraries(wdt_min
-${FOLLY_LIBRARIES}
-${GLOG_LIBRARY}
-${GFLAGS_LIBRARY}
-${Boost_LIBRARIES}
-${DOUBLECONV_LIBRARY}
-${OPENSSL_CRYPTO_LIBRARY}
-${CMAKE_THREAD_LIBS_INIT} # Must be last to avoid link errors
-)
+        ${FOLLY_LIBRARIES}
+        ${GLOG_LIBRARY}
+        ${GFLAGS_LIBRARY}
+        ${Boost_LIBRARIES}
+        ${DOUBLECONV_LIBRARY}
+        ${OPENSSL_CRYPTO_LIBRARY}
+        ${CMAKE_THREAD_LIBS_INIT} # Must be last to avoid link errors
+        )
 
 # What we need to build the part of folly we use:
 
@@ -172,7 +172,7 @@ check_cxx_source_compiles("#include <type_traits>
       #endif
       int main() {return 0;}" FOLLY_USE_LIBCPP)
 check_cxx_source_compiles(
-"extern \"C\" void cmkcheckweak() __attribute__((weak));
+        "extern \"C\" void cmkcheckweak() __attribute__((weak));
 int main(int argc, char** argv) {
   return (cmkcheckweak) ? 1 : 0 ;
 }" FOLLY_HAVE_WEAK_SYMBOLS)
@@ -206,10 +206,10 @@ target_link_libraries(wdtbin wdt_min)
 set_target_properties(wdtbin PROPERTIES RUNTIME_OUTPUT_NAME "wdt")
 
 install(TARGETS wdtbin wdt wdt_min
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  )
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        )
 
 ### Install header files
 
